@@ -5,7 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>JEDI - Jakarta Equipment Data Inventory</title>
 
+  <!-- QR CODE LIBRARY -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
   <style>
+
     *{
       margin:0;
       padding:0;
@@ -13,92 +17,110 @@
       font-family:Arial, sans-serif;
     }
 
-/* GANTI CSS BODY & CONTAINER YANG LAMA DENGAN INI */
+    body{
+      background:#0f1115;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      min-height:100vh;
+      color:white;
+      padding:20px;
+    }
 
-body{
-  background:#0f1115;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  min-height:100vh;
-  color:white;
-}
+    .container{
+      width:100%;
+      max-width:420px;
+      background:#1b1f27;
+      padding:30px;
+      border-radius:16px;
+      box-shadow:0 4px 25px rgba(0,0,0,0.4);
+      border:1px solid #2a2f3a;
+    }
 
-.container{
-  width:100%;
-  max-width:420px;
-  background:#1b1f27;
-  padding:30px;
-  border-radius:16px;
-  box-shadow:0 4px 25px rgba(0,0,0,0.4);
-  border:1px solid #2a2f3a;
-}
+    h2{
+      text-align:center;
+      margin-bottom:25px;
+      color:#ffffff;
+    }
 
-h2{
-  text-align:center;
-  margin-bottom:25px;
-  color:#ffffff;
-}
+    label{
+      display:block;
+      margin-bottom:8px;
+      font-weight:bold;
+      color:#d5d7dc;
+    }
 
-label{
-  display:block;
-  margin-bottom:8px;
-  font-weight:bold;
-  color:#d5d7dc;
-}
+    .input-group{
+      margin-bottom:18px;
+    }
 
-input,
-select{
-  width:100%;
-  padding:12px;
-  border:1px solid #343b48;
-  border-radius:10px;
-  font-size:15px;
-  background:#11151c;
-  color:white;
-}
+    input,
+    select{
+      width:100%;
+      padding:12px;
+      border:1px solid #343b48;
+      border-radius:10px;
+      font-size:15px;
+      background:#11151c;
+      color:white;
+    }
 
-input::placeholder{
-  color:#8b93a7;
-}
+    input::placeholder{
+      color:#8b93a7;
+    }
 
-input:focus,
-select:focus{
-  outline:none;
-  border:1px solid #4da3ff;
-  box-shadow:0 0 10px rgba(77,163,255,0.3);
-}
+    input:focus,
+    select:focus{
+      outline:none;
+      border:1px solid #4da3ff;
+      box-shadow:0 0 10px rgba(77,163,255,0.3);
+    }
 
-button{
-  width:100%;
-  padding:13px;
-  border:none;
-  border-radius:10px;
-  background:#1677ff;
-  color:white;
-  font-size:16px;
-  font-weight:bold;
-  cursor:pointer;
-  transition:0.3s;
-}
+    button{
+      width:100%;
+      padding:13px;
+      border:none;
+      border-radius:10px;
+      background:#1677ff;
+      color:white;
+      font-size:16px;
+      font-weight:bold;
+      cursor:pointer;
+      transition:0.3s;
+    }
 
-button:hover{
-  background:#005fe0;
-}
+    button:hover{
+      background:#005fe0;
+    }
 
-.info{
-  margin-top:15px;
-  text-align:center;
-  color:#ff6b6b;
-  font-size:14px;
-}
+    .info{
+      margin-top:15px;
+      text-align:center;
+      color:#ff6b6b;
+      font-size:14px;
+    }
+
     .manual-input{
       margin-top:10px;
     }
 
     .hidden{
-  display:none !important;
-}
+      display:none !important;
+    }
+
+    .result-box{
+      background:#11151c;
+      padding:20px;
+      border-radius:12px;
+      border:1px solid #343b48;
+      margin-top:20px;
+    }
+
+    #qrcode{
+      margin-top:20px;
+      display:flex;
+      justify-content:center;
+    }
 
   </style>
 </head>
@@ -133,6 +155,7 @@ button:hover{
 
     <!-- Nama Asset -->
     <div class="input-group">
+
       <label>Nama Asset</label>
 
       <select id="assetName">
@@ -144,16 +167,18 @@ button:hover{
         <option value="Manual">Isi Manual</option>
       </select>
 
-      <input 
+      <input
         type="text"
         id="manualAssetName"
         class="manual-input hidden"
         placeholder="Masukkan nama asset manual"
       >
+
     </div>
 
     <!-- Fasilitas -->
     <div class="input-group">
+
       <label>Fasilitas</label>
 
       <select id="facility">
@@ -164,27 +189,56 @@ button:hover{
         <option value="DAT">DAT</option>
         <option value="EME">EME</option>
       </select>
+
     </div>
 
     <!-- Tahun -->
     <div class="input-group">
+
       <label>Tahun Instalasi</label>
 
       <select id="yearSelect">
         <option value="">-- Pilih Tahun --</option>
       </select>
 
-      <input 
+      <input
         type="number"
         id="manualYear"
         class="manual-input hidden"
         placeholder="Masukkan tahun manual"
       >
+
     </div>
 
     <button onclick="submitAsset()">Submit</button>
 
     <div class="info" id="submitInfo"></div>
+
+    <!-- RESULT -->
+    <div id="assetResult" class="hidden">
+
+      <h3 style="margin-top:25px; text-align:center;">
+        Asset Generated
+      </h3>
+
+      <div class="result-box">
+
+        <p><b>Asset ID:</b> <span id="generatedAssetId"></span></p>
+        <br>
+
+        <p><b>Nama:</b> <span id="generatedAssetName"></span></p>
+        <br>
+
+        <p><b>Fasilitas:</b> <span id="generatedFacility"></span></p>
+        <br>
+
+        <p><b>Tahun:</b> <span id="generatedYear"></span></p>
+
+        <div id="qrcode"></div>
+
+      </div>
+
+    </div>
 
   </div>
 
@@ -197,45 +251,55 @@ button:hover{
   const currentYear = new Date().getFullYear();
 
   for(let year = currentYear; year >= 2013; year--){
+
     let option = document.createElement("option");
+
     option.value = year;
     option.textContent = year;
+
     yearSelect.appendChild(option);
+
   }
 
-  // Tambahan manual
+  // manual year
   let manualOption = document.createElement("option");
+
   manualOption.value = "manual";
   manualOption.textContent = "Isi Manual";
+
   yearSelect.appendChild(manualOption);
 
   // =========================
   // SHOW MANUAL ASSET INPUT
   // =========================
-  document.getElementById("assetName").addEventListener("change", function(){
+  document.getElementById("assetName")
+    .addEventListener("change", function(){
 
-    const manualInput = document.getElementById("manualAssetName");
+      const manualInput =
+        document.getElementById("manualAssetName");
 
-    if(this.value === "Manual"){
-      manualInput.classList.remove("hidden");
-    }else{
-      manualInput.classList.add("hidden");
-    }
+      if(this.value === "Manual"){
+        manualInput.classList.remove("hidden");
+      }else{
+        manualInput.classList.add("hidden");
+      }
 
   });
 
   // =========================
   // SHOW MANUAL YEAR INPUT
   // =========================
-  document.getElementById("yearSelect").addEventListener("change", function(){
+  document.getElementById("yearSelect")
+    .addEventListener("change", function(){
 
-    const manualYear = document.getElementById("manualYear");
+      const manualYear =
+        document.getElementById("manualYear");
 
-    if(this.value === "manual"){
-      manualYear.classList.remove("hidden");
-    }else{
-      manualYear.classList.add("hidden");
-    }
+      if(this.value === "manual"){
+        manualYear.classList.remove("hidden");
+      }else{
+        manualYear.classList.add("hidden");
+      }
 
   });
 
@@ -244,24 +308,55 @@ button:hover{
   // =========================
   function login(){
 
-    const nik = document.getElementById("nik").value;
-    const password = document.getElementById("password").value;
-    const info = document.getElementById("loginInfo");
+    const nik =
+      document.getElementById("nik").value;
 
-    // Validasi
+    const password =
+      document.getElementById("password").value;
+
+    const info =
+      document.getElementById("loginInfo");
+
+    // validasi nik
     if(nik.length !== 8 || isNaN(nik)){
-      info.innerHTML = "NIK harus terdiri dari 8 digit angka";
+
+      info.innerHTML =
+        "NIK harus terdiri dari 8 digit angka";
+
       return;
     }
 
+    // validasi password
     if(password !== "123456"){
+
       info.innerHTML = "Password salah";
+
       return;
     }
 
     // sukses login
-    document.getElementById("loginPage").classList.add("hidden");
-    document.getElementById("officerPage").classList.remove("hidden");
+    document.getElementById("loginPage")
+      .classList.add("hidden");
+
+    document.getElementById("officerPage")
+      .classList.remove("hidden");
+
+  }
+
+  // =========================
+  // RANDOM NUMBER
+  // =========================
+  function randomNumber(length){
+
+    let result = '';
+
+    for(let i = 0; i < length; i++){
+
+      result += Math.floor(Math.random() * 10);
+
+    }
+
+    return result;
 
   }
 
@@ -270,41 +365,114 @@ button:hover{
   // =========================
   function submitAsset(){
 
-    let assetName = document.getElementById("assetName").value;
-    const manualAssetName = document.getElementById("manualAssetName").value;
+    let assetName =
+      document.getElementById("assetName").value;
 
-    const facility = document.getElementById("facility").value;
+    const manualAssetName =
+      document.getElementById("manualAssetName").value;
 
-    let year = document.getElementById("yearSelect").value;
-    const manualYear = document.getElementById("manualYear").value;
+    const facility =
+      document.getElementById("facility").value;
 
-    const info = document.getElementById("submitInfo");
+    let year =
+      document.getElementById("yearSelect").value;
 
-    // nama manual
+    const manualYear =
+      document.getElementById("manualYear").value;
+
+    const info =
+      document.getElementById("submitInfo");
+
+    // manual asset
     if(assetName === "Manual"){
       assetName = manualAssetName;
     }
 
-    // tahun manual
+    // manual year
     if(year === "manual"){
       year = manualYear;
     }
 
     // validasi
-    if(assetName === "" || facility === "" || year === ""){
-      info.innerHTML = "Semua field wajib diisi";
+    if(assetName === "" ||
+       facility === "" ||
+       year === ""){
+
+      info.style.color = "#ff6b6b";
+
+      info.innerHTML =
+        "Semua field wajib diisi";
+
       return;
     }
 
-    // simulasi submit
+    // =========================
+    // GENERATE ASSET ID
+    // =========================
+    const assetId =
+      facility + "-" +
+      year + "-" +
+      randomNumber(4);
+
+    // =========================
+    // QR CONTENT
+    // =========================
+    const qrData =
+      "Asset ID: " + assetId +
+      "\nNama: " + assetName +
+      "\nFasilitas: " + facility +
+      "\nTahun: " + year;
+
+    // =========================
+    // SHOW RESULT
+    // =========================
+    document.getElementById("generatedAssetId")
+      .innerText = assetId;
+
+    document.getElementById("generatedAssetName")
+      .innerText = assetName;
+
+    document.getElementById("generatedFacility")
+      .innerText = facility;
+
+    document.getElementById("generatedYear")
+      .innerText = year;
+
+    // tampilkan result
+    document.getElementById("assetResult")
+      .classList.remove("hidden");
+
+    // clear qr lama
+    document.getElementById("qrcode")
+      .innerHTML = "";
+
+    // generate qr baru
+    new QRCode(document.getElementById("qrcode"), {
+
+      text: qrData,
+      width: 220,
+      height: 220,
+      colorDark : "#ffffff",
+      colorLight : "#11151c",
+      correctLevel : QRCode.CorrectLevel.H
+
+    });
+
+    // success message
+    info.style.color = "#00ff99";
+
+    info.innerHTML =
+      "Asset berhasil dibuat";
+
+    // simulasi database
     console.log({
+
+      asset_id: assetId,
       nama_asset: assetName,
       fasilitas: facility,
       tahun_instalasi: year
-    });
 
-    info.style.color = "green";
-    info.innerHTML = "Data asset berhasil disubmit";
+    });
 
   }
 
