@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Asset Inventory System</title>
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Arial, sans-serif;
+    }
+
+    body{
+      background:#f3f5f7;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      min-height:100vh;
+    }
+
+    .container{
+      width:100%;
+      max-width:420px;
+      background:white;
+      padding:30px;
+      border-radius:16px;
+      box-shadow:0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    h2{
+      text-align:center;
+      margin-bottom:25px;
+      color:#222;
+    }
+
+    .input-group{
+      margin-bottom:18px;
+    }
+
+    label{
+      display:block;
+      margin-bottom:8px;
+      font-weight:bold;
+      color:#333;
+    }
+
+    input, select{
+      width:100%;
+      padding:12px;
+      border:1px solid #ccc;
+      border-radius:10px;
+      font-size:15px;
+    }
+
+    button{
+      width:100%;
+      padding:13px;
+      border:none;
+      border-radius:10px;
+      background:#007bff;
+      color:white;
+      font-size:16px;
+      font-weight:bold;
+      cursor:pointer;
+      transition:0.3s;
+    }
+
+    button:hover{
+      background:#0056b3;
+    }
+
+    .hidden{
+      display:none;
+    }
+
+    .info{
+      margin-top:15px;
+      text-align:center;
+      color:red;
+      font-size:14px;
+    }
+
+    .manual-input{
+      margin-top:10px;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- LOGIN PAGE -->
+  <div class="container" id="loginPage">
+
+    <h2>Officer Login</h2>
+
+    <div class="input-group">
+      <label>User ID (NIK)</label>
+      <input type="text" id="nik" maxlength="8" placeholder="Masukkan 8 digit NIK">
+    </div>
+
+    <div class="input-group">
+      <label>Password</label>
+      <input type="password" id="password" placeholder="Masukkan password">
+    </div>
+
+    <button onclick="login()">Login</button>
+
+    <div class="info" id="loginInfo"></div>
+
+  </div>
+
+  <!-- OFFICER AREA -->
+  <div class="container hidden" id="officerPage">
+
+    <h2>Input Data Asset</h2>
+
+    <!-- Nama Asset -->
+    <div class="input-group">
+      <label>Nama Asset</label>
+
+      <select id="assetName">
+        <option value="">-- Pilih Asset --</option>
+        <option value="VHF Radio">VHF Radio</option>
+        <option value="UPS">UPS</option>
+        <option value="DVOR">DVOR</option>
+        <option value="Radar">Radar</option>
+        <option value="Manual">Isi Manual</option>
+      </select>
+
+      <input 
+        type="text"
+        id="manualAssetName"
+        class="manual-input hidden"
+        placeholder="Masukkan nama asset manual"
+      >
+    </div>
+
+    <!-- Fasilitas -->
+    <div class="input-group">
+      <label>Fasilitas</label>
+
+      <select id="facility">
+        <option value="">-- Pilih Fasilitas --</option>
+        <option value="COM">COM</option>
+        <option value="NAV">NAV</option>
+        <option value="SUR">SUR</option>
+        <option value="DAT">DAT</option>
+        <option value="EME">EME</option>
+      </select>
+    </div>
+
+    <!-- Tahun -->
+    <div class="input-group">
+      <label>Tahun Instalasi</label>
+
+      <select id="yearSelect">
+        <option value="">-- Pilih Tahun --</option>
+      </select>
+
+      <input 
+        type="number"
+        id="manualYear"
+        class="manual-input hidden"
+        placeholder="Masukkan tahun manual"
+      >
+    </div>
+
+    <button onclick="submitAsset()">Submit</button>
+
+    <div class="info" id="submitInfo"></div>
+
+  </div>
+
+<script>
+
+  // =========================
+  // GENERATE YEAR DROPDOWN
+  // =========================
+  const yearSelect = document.getElementById("yearSelect");
+  const currentYear = new Date().getFullYear();
+
+  for(let year = currentYear; year >= 2013; year--){
+    let option = document.createElement("option");
+    option.value = year;
+    option.textContent = year;
+    yearSelect.appendChild(option);
+  }
+
+  // Tambahan manual
+  let manualOption = document.createElement("option");
+  manualOption.value = "manual";
+  manualOption.textContent = "Isi Manual";
+  yearSelect.appendChild(manualOption);
+
+  // =========================
+  // SHOW MANUAL ASSET INPUT
+  // =========================
+  document.getElementById("assetName").addEventListener("change", function(){
+
+    const manualInput = document.getElementById("manualAssetName");
+
+    if(this.value === "Manual"){
+      manualInput.classList.remove("hidden");
+    }else{
+      manualInput.classList.add("hidden");
+    }
+
+  });
+
+  // =========================
+  // SHOW MANUAL YEAR INPUT
+  // =========================
+  document.getElementById("yearSelect").addEventListener("change", function(){
+
+    const manualYear = document.getElementById("manualYear");
+
+    if(this.value === "manual"){
+      manualYear.classList.remove("hidden");
+    }else{
+      manualYear.classList.add("hidden");
+    }
+
+  });
+
+  // =========================
+  // LOGIN FUNCTION
+  // =========================
+  function login(){
+
+    const nik = document.getElementById("nik").value;
+    const password = document.getElementById("password").value;
+    const info = document.getElementById("loginInfo");
+
+    // Validasi
+    if(nik.length !== 8 || isNaN(nik)){
+      info.innerHTML = "NIK harus terdiri dari 8 digit angka";
+      return;
+    }
+
+    if(password !== "123456"){
+      info.innerHTML = "Password salah";
+      return;
+    }
+
+    // sukses login
+    document.getElementById("loginPage").classList.add("hidden");
+    document.getElementById("officerPage").classList.remove("hidden");
+
+  }
+
+  // =========================
+  // SUBMIT ASSET
+  // =========================
+  function submitAsset(){
+
+    let assetName = document.getElementById("assetName").value;
+    const manualAssetName = document.getElementById("manualAssetName").value;
+
+    const facility = document.getElementById("facility").value;
+
+    let year = document.getElementById("yearSelect").value;
+    const manualYear = document.getElementById("manualYear").value;
+
+    const info = document.getElementById("submitInfo");
+
+    // nama manual
+    if(assetName === "Manual"){
+      assetName = manualAssetName;
+    }
+
+    // tahun manual
+    if(year === "manual"){
+      year = manualYear;
+    }
+
+    // validasi
+    if(assetName === "" || facility === "" || year === ""){
+      info.innerHTML = "Semua field wajib diisi";
+      return;
+    }
+
+    // simulasi submit
+    console.log({
+      nama_asset: assetName,
+      fasilitas: facility,
+      tahun_instalasi: year
+    });
+
+    info.style.color = "green";
+    info.innerHTML = "Data asset berhasil disubmit";
+
+  }
+
+</script>
+
+</body>
+</html>
